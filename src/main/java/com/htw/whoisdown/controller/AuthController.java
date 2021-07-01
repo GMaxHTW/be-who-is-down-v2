@@ -1,5 +1,6 @@
 package com.htw.whoisdown.controller;
 
+import com.htw.whoisdown.email.EmailSender;
 import com.htw.whoisdown.payload.request.LoginRequest;
 import com.htw.whoisdown.payload.request.SignupRequest;
 import com.htw.whoisdown.payload.response.JwtResponse;
@@ -34,6 +35,9 @@ public class AuthController {
 
     @Autowired
     PasswordEncoder encoder;
+
+    @Autowired
+    EmailSender emailSender;
 
     @Autowired
     JwtUtils jwtUtils;
@@ -75,6 +79,9 @@ public class AuthController {
                 encoder.encode(signUpRequest.getPassword()));
 
         userRepository.save(user);
+
+        emailSender.sendEmail("Email Bestaetigung", emailSender.buildEmail(signUpRequest.getUsername()),
+                "info@whoisdown.de", signUpRequest.getEmail(), false);
 
         return ResponseEntity.ok(new MessageResponse("Successfully registered"));
     }
